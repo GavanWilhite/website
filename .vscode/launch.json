@@ -1,0 +1,17 @@
+{
+	"configurations": [
+		{
+			"type": "pwa-node",
+			"request": "launch",
+			"runtimeArgs": ["run-script", "debug"],
+			"name": "Debug Docgen",
+			"runtimeExecutable": "npm",
+			"skipFiles": ["<node_internals>/**", "node_modules/tslib/**"],
+			"internalConsoleOptions": "openOnSessionStart",
+			"cwd": "${workspaceFolder}/docusaurus-discordjs-docgen",
+			"console": "internalConsole",
+			"outputCapture": "std",
+			"outFiles": ["${workspaceFolder}/docusaurus-discordjs-docgen/dist/**/*.js"]
+		}
+	]
+}
