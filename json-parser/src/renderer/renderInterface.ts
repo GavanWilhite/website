@@ -20,15 +20,17 @@ custom_edit_url: null
 }
 
 export function renderInterfaces(projectParser: ProjectParser, outputDir: string, isGroup: boolean) {
-	const categoryDir = writeCategoryYaml(outputDir, 'interface', 'Interfaces', isGroup ? 2 : 1);
+	if (!projectParser.interfaces.every((interfaceParser) => interfaceParser.external)) {
+		const categoryDir = writeCategoryYaml(outputDir, 'interface', 'Interfaces', isGroup ? 2 : 1);
 
-	let fileSidebarPosition = 0;
+		let fileSidebarPosition = 0;
 
-	for (const interfaceParser of projectParser.interfaces) {
-		if (interfaceParser.external) continue;
+		for (const interfaceParser of projectParser.interfaces) {
+			if (interfaceParser.external) continue;
 
-		renderInterface(interfaceParser, categoryDir, fileSidebarPosition);
+			renderInterface(interfaceParser, categoryDir, fileSidebarPosition);
 
-		fileSidebarPosition++;
+			fileSidebarPosition++;
+		}
 	}
 }

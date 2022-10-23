@@ -20,15 +20,17 @@ custom_edit_url: null
 }
 
 export function renderTypeAliases(projectParser: ProjectParser, outputDir: string, isGroup: boolean) {
-	const categoryDir = writeCategoryYaml(outputDir, 'typeAlias', 'Type Aliases', isGroup ? 2 : 1);
+	if (!projectParser.typeAliases.every((typeAliasParser) => typeAliasParser.external)) {
+		const categoryDir = writeCategoryYaml(outputDir, 'typeAlias', 'Type Aliases', isGroup ? 2 : 1);
 
-	let fileSidebarPosition = 0;
+		let fileSidebarPosition = 0;
 
-	for (const typeAliasParser of projectParser.typeAliases) {
-		if (typeAliasParser.external) continue;
+		for (const typeAliasParser of projectParser.typeAliases) {
+			if (typeAliasParser.external) continue;
 
-		renderTypeAlias(typeAliasParser, categoryDir, fileSidebarPosition);
+			renderTypeAlias(typeAliasParser, categoryDir, fileSidebarPosition);
 
-		fileSidebarPosition++;
+			fileSidebarPosition++;
+		}
 	}
 }

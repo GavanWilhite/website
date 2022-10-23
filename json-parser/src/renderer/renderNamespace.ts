@@ -20,15 +20,17 @@ custom_edit_url: null
 }
 
 export function renderNamespaces(projectParser: ProjectParser, outputDir: string, isGroup: boolean) {
-	const categoryDir = writeCategoryYaml(outputDir, 'namespace', 'Namespaces', isGroup ? 2 : 1);
+	if (!projectParser.namespaces.every((namespaceParser) => namespaceParser.external)) {
+		const categoryDir = writeCategoryYaml(outputDir, 'namespace', 'Namespaces', isGroup ? 2 : 1);
 
-	let fileSidebarPosition = 0;
+		let fileSidebarPosition = 0;
 
-	for (const namespaceParser of projectParser.namespaces) {
-		if (namespaceParser.external) continue;
+		for (const namespaceParser of projectParser.namespaces) {
+			if (namespaceParser.external) continue;
 
-		renderNamespace(namespaceParser, categoryDir, fileSidebarPosition);
+			renderNamespace(namespaceParser, categoryDir, fileSidebarPosition);
 
-		fileSidebarPosition++;
+			fileSidebarPosition++;
+		}
 	}
 }

@@ -37,16 +37,18 @@ ${parseMembers(enumParser.members)}
 }
 
 export function renderEnums(projectParser: ProjectParser, outputDir: string, isGroup: boolean) {
-	const categoryDir = writeCategoryYaml(outputDir, 'enum', 'Enums', isGroup ? 2 : 1);
+	if (!projectParser.enums.every((enumParser) => enumParser.external)) {
+		const categoryDir = writeCategoryYaml(outputDir, 'enum', 'Enums', isGroup ? 2 : 1);
 
-	let fileSidebarPosition = 0;
+		let fileSidebarPosition = 0;
 
-	for (const enumParser of projectParser.enums) {
-		if (enumParser.external) continue;
+		for (const enumParser of projectParser.enums) {
+			if (enumParser.external) continue;
 
-		renderEnum(enumParser, categoryDir, fileSidebarPosition);
+			renderEnum(enumParser, categoryDir, fileSidebarPosition);
 
-		fileSidebarPosition++;
+			fileSidebarPosition++;
+		}
 	}
 }
 

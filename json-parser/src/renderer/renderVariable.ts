@@ -20,15 +20,17 @@ custom_edit_url: null
 }
 
 export function renderVariables(projectParser: ProjectParser, outputDir: string, isGroup: boolean) {
-	const categoryDir = writeCategoryYaml(outputDir, 'constant', 'Variables', isGroup ? 2 : 1);
+	if (!projectParser.variables.every((constantParser) => constantParser.external)) {
+		const categoryDir = writeCategoryYaml(outputDir, 'constant', 'Variables', isGroup ? 2 : 1);
 
-	let fileSidebarPosition = 0;
+		let fileSidebarPosition = 0;
 
-	for (const constantParser of projectParser.variables) {
-		if (constantParser.external) continue;
+		for (const constantParser of projectParser.variables) {
+			if (constantParser.external) continue;
 
-		renderVariable(constantParser, categoryDir, fileSidebarPosition);
+			renderVariable(constantParser, categoryDir, fileSidebarPosition);
 
-		fileSidebarPosition++;
+			fileSidebarPosition++;
+		}
 	}
 }

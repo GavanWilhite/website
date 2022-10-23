@@ -54,16 +54,18 @@ ${parseMethods(classParser.methods)}
 }
 
 export function renderClasses(projectParser: ProjectParser, outputDir: string, isGroup: boolean) {
-	const categoryDir = writeCategoryYaml(outputDir, 'class', 'Classes', isGroup ? 2 : 1);
+	if (!projectParser.classes.every((classParser) => classParser.external)) {
+		const categoryDir = writeCategoryYaml(outputDir, 'class', 'Classes', isGroup ? 2 : 1);
 
-	let fileSidebarPosition = 0;
+		let fileSidebarPosition = 0;
 
-	for (const classParser of projectParser.classes) {
-		if (classParser.external) continue;
+		for (const classParser of projectParser.classes) {
+			if (classParser.external) continue;
 
-		renderClass(classParser, categoryDir, fileSidebarPosition);
+			renderClass(classParser, categoryDir, fileSidebarPosition);
 
-		fileSidebarPosition++;
+			fileSidebarPosition++;
+		}
 	}
 }
 
