@@ -11,6 +11,7 @@
 	"private": true,
 	"scripts": {
 		"build-plugin": "tsc -b docusaurus-typedoc-json-parser",
+		"debug-plugin": "node scripts/debug.mjs",
 		"docusaurus": "docusaurus",
 		"start": "yarn build-plugin && docusaurus start",
 		"build": "yarn build-plugin && docusaurus build",

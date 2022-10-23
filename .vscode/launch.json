@@ -8,10 +8,13 @@
 			"runtimeExecutable": "npm",
 			"skipFiles": ["<node_internals>/**", "node_modules/tslib/**"],
 			"internalConsoleOptions": "openOnSessionStart",
-			"cwd": "${workspaceFolder}/docusaurus-discordjs-docgen",
+			"cwd": "${workspaceFolder}/docusaurus-typedoc-json-parser",
+			"env": {
+				"NODE_ENV": "development"
+			},
 			"console": "internalConsole",
 			"outputCapture": "std",
-			"outFiles": ["${workspaceFolder}/docusaurus-discordjs-docgen/dist/**/*.js"]
+			"outFiles": ["${workspaceFolder}/docusaurus-typedoc-json-parser/dist/**/*.js"]
 		}
 	]
 }
