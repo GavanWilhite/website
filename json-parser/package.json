@@ -9,7 +9,7 @@
 	],
 	"scripts": {
 		"build": "tsup",
-		"debug": "node --inspect scripts/debug.mjs",
+		"debug": "node --inspect dist/cli.mjs",
 		"start": "node dist/cli.mjs"
 	},
 	"dependencies": {
