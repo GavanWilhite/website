@@ -131,7 +131,13 @@ ${methods
 		method.signatures
 			.map(
 				(signature) =>
-					`### ${signature.name}${
+					`### ${
+						method.accessibility === ClassParser.Accessibility.Protected
+							? '`PROTECTED` '
+							: method.accessibility === ClassParser.Accessibility.Private
+							? '`PRIVATE `'
+							: ''
+					}${method.static ? '`STATIC` ' : ''}${signature.name}${
 						signature.typeParameters.length ? `<${signature.typeParameters.map((typeParameter) => typeParameter.name).join(', ')}\\>` : ''
 					}(${signature.parameters.map((parameter) => parameter.name).join(', ')}): ${signature.returnType.toString()}
 
