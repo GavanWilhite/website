@@ -21,7 +21,7 @@ custom_edit_url: null
 
 export function renderTypeAliases(projectParser: ProjectParser, outputDir: string, isGroup: boolean) {
 	if (!projectParser.typeAliases.every((typeAliasParser) => typeAliasParser.external)) {
-		const categoryDir = writeCategoryYaml(outputDir, 'typeAlias', 'Type Aliases', isGroup ? 2 : 1);
+		const categoryDir = writeCategoryYaml(outputDir, 'type-alias', 'Type Aliases', isGroup ? 2 : 1);
 
 		let fileSidebarPosition = 0;
 

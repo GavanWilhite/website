@@ -4,6 +4,7 @@ import { ClassMethodParser, ClassParser, ClassPropertyParser, ProjectParser, Typ
 import { parseExamples } from './utilities/parseExamples';
 import { parseParameters } from './utilities/parseParameters';
 import { parseSee } from './utilities/parseSee';
+import { parseType } from './utilities/parseType';
 import { parseTypeParameters } from './utilities/parseTypeParameters';
 import { writeCategoryYaml } from './writeCategoryYaml';
 
@@ -70,11 +71,11 @@ export function renderClasses(projectParser: ProjectParser, outputDir: string, i
 }
 
 function parseExtendsType(typeParser: TypeParser | null): string | null {
-	return typeParser?.toString() ?? null;
+	return typeParser ? parseType(typeParser) : null;
 }
 
 function parseImplementsType(typeParsers: TypeParser[]): string[] {
-	return typeParsers.map((typeParser) => typeParser.toString());
+	return typeParsers.map((typeParser) => parseType(typeParser));
 }
 
 function parseConstructor(classParser: ClassParser): string {
@@ -112,7 +113,7 @@ ${properties
 				? '`PRIVATE` '
 				: ''
 		}${property.static ? '`STATIC` ' : ''}${property.readonly ? '`READONLY` ' : ''}${property.name}${
-			property.type ? `${property.optional ? '?' : ''}: ${property.type.toString()}` : ''
+			property.type ? `${property.optional ? '?' : ''}: ${parseType(property.type)}` : ''
 		}
 
 ${property.comment.description ?? 'No description provided.'}`
@@ -139,7 +140,7 @@ ${methods
 							: ''
 					}${method.static ? '`STATIC` ' : ''}${signature.name}${
 						signature.typeParameters.length ? `<${signature.typeParameters.map((typeParameter) => typeParameter.name).join(', ')}\\>` : ''
-					}(${signature.parameters.map((parameter) => parameter.name).join(', ')}): ${signature.returnType.toString()}
+					}(${signature.parameters.map((parameter) => parameter.name).join(', ')}): ${parseType(signature.returnType)}
 
 ${signature.comment.description ?? 'No description provided.'}
 

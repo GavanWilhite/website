@@ -2,6 +2,7 @@ import type { SignatureParser } from 'typedoc-json-parser';
 import { parseExamples } from './parseExamples';
 import { parseParameters } from './parseParameters';
 import { parseSee } from './parseSee';
+import { parseType } from './parseType';
 import { parseTypeParameters } from './parseTypeParameters';
 
 export function parseSignatures(signatures: SignatureParser[]): string {
@@ -13,7 +14,7 @@ export function parseSignatures(signatures: SignatureParser[]): string {
 function parseSignature(signature: SignatureParser): string {
 	return `### ${signature.name}${
 		signature.typeParameters.length ? `<${signature.typeParameters.map((typeParameter) => typeParameter.name).join(', ')}\\>` : ''
-	}(${signature.parameters.map((parameter) => parameter.name).join(', ')}): ${signature.returnType.toString()}
+	}(${signature.parameters.map((parameter) => parameter.name).join(', ')}): ${parseType(signature.returnType)}
 
 ${signature.comment.description ?? 'No description provided.'}
 

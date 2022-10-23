@@ -1,7 +1,18 @@
 import { fetch } from '@sapphire/fetch';
+import { blue, bold } from 'colorette';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ProjectParser, ReferenceTypeParser } from 'typedoc-json-parser';
+import {
+	ClassParser,
+	EnumParser,
+	FunctionParser,
+	InterfaceParser,
+	NamespaceParser,
+	ProjectParser,
+	ReferenceTypeParser,
+	TypeAliasParser,
+	VariableParser
+} from 'typedoc-json-parser';
 import { renderOutputFiles } from './renderer/render';
 import { removeDirectory } from './renderer/utilities/removeDirectory';
 import { writeCategoryYaml } from './renderer/writeCategoryYaml';
@@ -11,9 +22,29 @@ import { RepositoryContent, RepositoryContentFileType } from './types/Repository
 ReferenceTypeParser.formatToString = (parser) => {
 	const typeArguments = parser.typeArguments.length > 0 ? `<${parser.typeArguments.map((type) => type.toString()).join(', ')}\\>` : '';
 
-	if (parser.id || parser.packageName) {
-		return `[\`${parser.name}\`](${parser.id ? parser.id : parser.packageName})${typeArguments}`;
+	if (parser.id) {
+		const found = parser.project.find(parser.id);
+
+		if (found && 'external' in found && !found.external) {
+			if (found instanceof NamespaceParser) {
+				return `[\`${parser.name}\`](../namespace/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+			} else if (found instanceof ClassParser) {
+				return `[\`${parser.name}\`](../class/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+			} else if (found instanceof FunctionParser) {
+				return `[\`${parser.name}\`](../function/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+			} else if (found instanceof InterfaceParser) {
+				return `[\`${parser.name}\`](../interface/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+			} else if (found instanceof TypeAliasParser) {
+				return `[\`${parser.name}\`](../type-alias/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+			} else if (found instanceof EnumParser) {
+				return `[\`${parser.name}\`](../enum/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+			} else if (found instanceof VariableParser) {
+				return `[\`${parser.name}\`](../variable/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+			}
+		}
 	}
+
+	if (parser.packageName) return `[\`${parser.name}\`](package::${parser.packageName})${typeArguments}`;
 
 	return `\`${parser.name}\`${typeArguments}`;
 };
@@ -27,6 +58,8 @@ export async function docusaurusTypeDocJsonParser(options: PluginOptions) {
 	if (githubToken) {
 		headers.append('Authorization', `Bearer ${githubToken}`);
 	}
+
+	console.info(blue(`${bold('[INFO]')} Fetching GitHub API...`));
 
 	const repositoryContents = await fetch<RepositoryContent[]>(githubContentUrl, { headers });
 	const repositoryDirectories = repositoryContents.filter((content) => content.type === RepositoryContentFileType.Directory);
