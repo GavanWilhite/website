@@ -22,7 +22,6 @@
 		"write-translations": "docusaurus write-translations",
 		"write-heading-ids": "docusaurus write-heading-ids",
 		"typecheck": "tsc -p tsconfig.eslint.json",
-		"update": "yarn upgrade-interactive",
 		"lint": "eslint src --ext mjs,ts --fix",
 		"lint:md": "markdownlint-cli2-fix",
 		"lint:md-no-fix": "markdownlint-cli2",
