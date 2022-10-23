@@ -49,12 +49,6 @@ const config = {
 					}
 				]
 			}
-		],
-		[
-			'docusaurus-typedoc-json-parser',
-			/** @type {import('docusaurus-typedoc-json-parser/dist/types').PluginOptions} */ ({
-				githubContentUrl: 'https://api.github.com/repos/sapphiredev/docs/contents/docs'
-			})
 		]
 	],
 

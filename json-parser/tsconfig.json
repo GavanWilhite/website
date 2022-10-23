@@ -2,9 +2,10 @@
 	"extends": "@sapphire/ts-config",
 	"compilerOptions": {
 		"rootDir": "src",
-		"outDir": "dist",
 		"lib": ["ESNext", "DOM"],
-		"tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
+		"target": "ESNext",
+		"module": "ESNext",
+		"incremental": false
 	},
 	"include": ["src"]
 }

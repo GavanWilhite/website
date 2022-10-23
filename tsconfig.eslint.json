@@ -1,16 +1,4 @@
 {
 	"extends": "./tsconfig.json",
-	"include": [
-		"babel.config.js",
-		"docs/General",
-		"docs/Guide",
-		"docusaurus.config.js",
-		"projects",
-		"scripts",
-		"sidebars.js",
-		"src",
-		"static",
-		"docusaurus-discordjs-docgen",
-		"docusaurus-typedoc-json-parser"
-	]
+	"include": ["babel.config.js", "docs/General", "docs/Guide", "docusaurus.config.js", "scripts", "sidebars.js", "src", "static", "json-parser"]
 }

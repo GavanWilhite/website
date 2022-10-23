@@ -8,13 +8,13 @@
 			"runtimeExecutable": "npm",
 			"skipFiles": ["<node_internals>/**", "node_modules/tslib/**"],
 			"internalConsoleOptions": "openOnSessionStart",
-			"cwd": "${workspaceFolder}/docusaurus-typedoc-json-parser",
+			"cwd": "${workspaceFolder}/json-parser",
 			"env": {
 				"NODE_ENV": "development"
 			},
 			"console": "internalConsole",
 			"outputCapture": "std",
-			"outFiles": ["${workspaceFolder}/docusaurus-typedoc-json-parser/dist/**/*.js"]
+			"outFiles": ["${workspaceFolder}/json-parser/dist/**/*.js"]
 		}
 	]
 }
