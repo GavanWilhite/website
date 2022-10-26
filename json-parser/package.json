@@ -10,7 +10,8 @@
 	"scripts": {
 		"build": "tsup",
 		"debug": "node --inspect dist/cli.mjs",
-		"start": "node dist/cli.mjs"
+		"start": "node dist/cli.mjs",
+		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@sapphire/fetch": "^2.4.1",
@@ -19,7 +20,7 @@
 		"colorette": "^2.0.19",
 		"common-tags": "^1.8.2",
 		"css": "^3.0.0",
-		"typedoc-json-parser": "^6.0.2"
+		"typedoc-json-parser": "^7.0.0"
 	},
 	"devDependencies": {
 		"@docusaurus/types": "^2.1.0",

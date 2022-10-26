@@ -19,11 +19,12 @@ import { writeCategoryYaml } from './renderer/writeCategoryYaml';
 import type { PluginOptions } from './types/PluginOptions';
 import { RepositoryContent, RepositoryContentFileType } from './types/RepositoryContent';
 
-ReferenceTypeParser.formatToString = (parser) => {
+ReferenceTypeParser.formatToString = (options) => {
+	const { parser, project } = options;
 	const typeArguments = parser.typeArguments.length > 0 ? `<${parser.typeArguments.map((type) => type.toString()).join(', ')}\\>` : '';
 
 	if (parser.id) {
-		const found = parser.project.find(parser.id);
+		const found = project?.find(parser.id);
 
 		if (found && 'external' in found && !found.external) {
 			if (found instanceof NamespaceParser) {
@@ -94,7 +95,7 @@ export async function docusaurusTypeDocJsonParser(options: PluginOptions) {
 
 					writeCategoryYaml(outputDir, '', subDirectoryContent.name.replace('.json', ''), 1);
 
-					const data = await fetch<ProjectParser.JSON>(subDirectoryContent.download_url);
+					const data = await fetch<ProjectParser.Json>(subDirectoryContent.download_url);
 					const incomingTypeDocJsonParserVersion = data.typeDocJsonParserVersion.split('.').map(Number) as [number, number, number];
 					const currentTypeDocJsonParserVersion = ProjectParser.version.split('.').map(Number) as [number, number, number];
 
@@ -116,7 +117,7 @@ export async function docusaurusTypeDocJsonParser(options: PluginOptions) {
 
 				writeCategoryYaml(outputDir, '', directoryContent.name.replace('.json', ''), 1);
 
-				const data = await fetch<ProjectParser.JSON>(directoryContent.download_url);
+				const data = await fetch<ProjectParser.Json>(directoryContent.download_url);
 				const incomingTypeDocJsonParserVersion = data.typeDocJsonParserVersion.split('.').map(Number) as [number, number, number];
 				const currentTypeDocJsonParserVersion = ProjectParser.version.split('.').map(Number) as [number, number, number];
 

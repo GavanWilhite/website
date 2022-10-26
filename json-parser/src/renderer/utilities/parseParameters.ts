@@ -9,7 +9,7 @@ export function parseParameters(parameters: ParameterParser[]): string {
 ${parameters
 	.map(
 		(parameter) =>
-			`| ${parameter.name} | ${parseType(parameter.type).replace('|', '\\|')} | ${
+			`| ${parameter.name} | ${parseType(parameter.type).replace(/|/g, '\\|')} | ${
 				parameter.comment.description ?? 'No description provided.'
 			} |`
 	)

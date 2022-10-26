@@ -8,7 +8,7 @@ export function parseTypeParameters(typeParameters: TypeParameterParser[]): stri
 | :---: | :---: | :---: |
 ${typeParameters.map(
 	(typeParameter) =>
-		`| ${typeParameter.name} | ${typeParameter.type ? parseType(typeParameter.type) : 'Not provided.'} | ${
+		`| ${typeParameter.name} | ${typeParameter.constraint ? parseType(typeParameter.constraint) : 'Not provided.'} | ${
 			typeParameter.default ? parseType(typeParameter.default) : 'Not provided.'
 		}`
 )}`;
