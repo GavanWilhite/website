@@ -9128,7 +9128,7 @@ __metadata:
     dotenv: ^16.0.3
     esbuild-plugin-file-path-extensions: ^1.0.0
     tsup: ^6.3.0
-    typedoc-json-parser: ^7.0.0
+    typedoc-json-parser: ^7.0.1
     typescript: ^4.8.4
   languageName: unknown
   linkType: soft
@@ -13798,9 +13798,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc-json-parser@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "typedoc-json-parser@npm:7.0.0"
+"typedoc-json-parser@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "typedoc-json-parser@npm:7.0.1"
   dependencies:
     "@favware/colorette-spinner": ^1.0.1
     "@sapphire/node-utilities": ^1.0.0
@@ -13811,7 +13811,7 @@ __metadata:
     typedoc: ^0.23.18
   bin:
     typedoc-json-parser: ./dist/bin/index.js
-  checksum: f9c7470bd6cebfc97990a12c852dbf244468ff74718b3608d34a9dea5d2e1446ca3e996001ea8dddc59c937d0131071ee47e44d435dcc5a4a336a768c41742c7
+  checksum: 8177c48bfe06dd2d64e41aeb93c886ac4db8fd6c8581e45b333178e043b47b3a97785dc1b3c9ad69932ead5a2d9f64999b30e9fff67e3420b8230d5df97117d9
   languageName: node
   linkType: hard
 
