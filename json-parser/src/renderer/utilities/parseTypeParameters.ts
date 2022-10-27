@@ -1,15 +1,14 @@
-import type { TypeParameterParser } from 'typedoc-json-parser';
-import { parseType } from './parseType';
+import type { ProjectParser, TypeParameterParser } from 'typedoc-json-parser';
 
-export function parseTypeParameters(typeParameters: TypeParameterParser[]): string {
+export function parseTypeParameters(typeParameters: TypeParameterParser[], projectParser: ProjectParser): string {
 	if (!typeParameters.length) return '';
 
 	return `| Name | Type | Default |
 | :---: | :---: | :---: |
 ${typeParameters.map(
 	(typeParameter) =>
-		`| ${typeParameter.name} | ${typeParameter.constraint ? parseType(typeParameter.constraint) : 'Not provided.'} | ${
-			typeParameter.default ? parseType(typeParameter.default) : 'Not provided.'
-		}`
+		`| ${typeParameter.name} | ${
+			typeParameter.constraint ? typeParameter.constraint.toString(projectParser).replace(/\|/g, '\\|') : 'Not provided.'
+		} | ${typeParameter.default ? typeParameter.default.toString(projectParser).replace(/\|/g, '\\|') : 'Not provided.'}`
 )}`;
 }

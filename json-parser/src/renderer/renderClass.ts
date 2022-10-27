@@ -4,11 +4,10 @@ import { ClassMethodParser, ClassParser, ClassPropertyParser, ProjectParser, Typ
 import { parseExamples } from './utilities/parseExamples';
 import { parseParameters } from './utilities/parseParameters';
 import { parseSee } from './utilities/parseSee';
-import { parseType } from './utilities/parseType';
 import { parseTypeParameters } from './utilities/parseTypeParameters';
 import { writeCategoryYaml } from './writeCategoryYaml';
 
-function renderClass(classParser: ClassParser, outputDir: string, fileSidebarPosition: number) {
+function renderClass(classParser: ClassParser, projectParser: ProjectParser, outputDir: string, fileSidebarPosition: number) {
 	const slug = classParser.name.toLowerCase().replace(/\s/g, '-');
 
 	const header = `---
@@ -19,8 +18,8 @@ sidebar_position: ${fileSidebarPosition}
 custom_edit_url: null
 ---`;
 
-	const classExtendsType = parseExtendsType(classParser.extendsType);
-	const classImplementsTypes = parseImplementsType(classParser.implementsType);
+	const classExtendsType = parseExtendsType(classParser.extendsType, projectParser);
+	const classImplementsTypes = parseImplementsType(classParser.implementsType, projectParser);
 
 	const result = `${header}
 ${classExtendsType === null ? '' : `**extends ${classExtendsType}**`}
@@ -30,7 +29,7 @@ ${
 	classParser.typeParameters.length
 		? `## Type Parameters
 
-${parseTypeParameters(classParser.typeParameters)}`
+${parseTypeParameters(classParser.typeParameters, projectParser)}`
 		: ''
 }
 
@@ -46,9 +45,9 @@ ${parseExamples(classParser.comment.example)}`
 		: ''
 }
 
-${parseConstructor(classParser)}
-${parseProperties(classParser.properties)}
-${parseMethods(classParser.methods)}
+${parseConstructor(classParser, projectParser)}
+${parseProperties(classParser.properties, projectParser)}
+${parseMethods(classParser.methods, projectParser)}
 `;
 
 	writeFileSync(resolve(outputDir, `${slug}.mdx`), result);
@@ -63,22 +62,22 @@ export function renderClasses(projectParser: ProjectParser, outputDir: string, i
 		for (const classParser of projectParser.classes) {
 			if (classParser.external) continue;
 
-			renderClass(classParser, categoryDir, fileSidebarPosition);
+			renderClass(classParser, projectParser, categoryDir, fileSidebarPosition);
 
 			fileSidebarPosition++;
 		}
 	}
 }
 
-function parseExtendsType(typeParser: TypeParser | null): string | null {
-	return typeParser ? parseType(typeParser) : null;
+function parseExtendsType(typeParser: TypeParser | null, projectParser: ProjectParser): string | null {
+	return typeParser ? typeParser.toString(projectParser) : null;
 }
 
-function parseImplementsType(typeParsers: TypeParser[]): string[] {
-	return typeParsers.map((typeParser) => parseType(typeParser));
+function parseImplementsType(typeParsers: TypeParser[], projectParser: ProjectParser): string[] {
+	return typeParsers.map((typeParser) => typeParser.toString(projectParser));
 }
 
-function parseConstructor(classParser: ClassParser): string {
+function parseConstructor(classParser: ClassParser, projectParser: ProjectParser): string {
 	return `## Constructor
 
 \`\`\`typescript ts2esm2cjs
@@ -91,14 +90,14 @@ ${
 				classParser.construct.parameters.length
 					? `### Parameters
 
-${parseParameters(classParser.construct.parameters)}`
+${parseParameters(classParser.construct.parameters, projectParser)}`
 					: ''
 		  }`
 		: ''
 }`;
 }
 
-function parseProperties(properties: ClassPropertyParser[]): string {
+function parseProperties(properties: ClassPropertyParser[], projectParser: ProjectParser): string {
 	if (!properties.length) return '';
 
 	return `
@@ -113,7 +112,7 @@ ${properties
 				? '`PRIVATE` '
 				: ''
 		}${property.static ? '`STATIC` ' : ''}${property.readonly ? '`READONLY` ' : ''}${property.name}${
-			property.type ? `${property.optional ? '?' : ''}: ${parseType(property.type)}` : ''
+			property.type ? `${property.optional ? '?' : ''}: ${property.type.toString(projectParser)}` : ''
 		}
 
 ${property.comment.description ?? 'No description provided.'}`
@@ -121,7 +120,7 @@ ${property.comment.description ?? 'No description provided.'}`
 	.join('\n\n')}`;
 }
 
-function parseMethods(methods: ClassMethodParser[]): string {
+function parseMethods(methods: ClassMethodParser[], projectParser: ProjectParser): string {
 	if (!methods.length) return '';
 
 	return `
@@ -140,7 +139,7 @@ ${methods
 							: ''
 					}${method.static ? '`STATIC` ' : ''}${signature.name}${
 						signature.typeParameters.length ? `<${signature.typeParameters.map((typeParameter) => typeParameter.name).join(', ')}\\>` : ''
-					}(${signature.parameters.map((parameter) => parameter.name).join(', ')}): ${parseType(signature.returnType)}
+					}(${signature.parameters.map((parameter) => parameter.name).join(', ')}): ${signature.returnType.toString(projectParser)}
 
 ${signature.comment.description ?? 'No description provided.'}
 
@@ -158,7 +157,7 @@ ${
 	signature.typeParameters.length
 		? `#### Type Parameters
 
-${parseTypeParameters(signature.typeParameters)}`
+${parseTypeParameters(signature.typeParameters, projectParser)}`
 		: ''
 }
 
@@ -166,7 +165,7 @@ ${
 	signature.parameters.length
 		? `#### Parameters
 
-${parseParameters(signature.parameters)}`
+${parseParameters(signature.parameters, projectParser)}`
 		: ''
 }`
 			)

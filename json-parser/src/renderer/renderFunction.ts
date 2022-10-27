@@ -4,7 +4,7 @@ import type { FunctionParser, ProjectParser } from 'typedoc-json-parser';
 import { parseSignatures } from './utilities/parseSignatures';
 import { writeCategoryYaml } from './writeCategoryYaml';
 
-function renderFunction(functionParser: FunctionParser, outputDir: string, fileSidebarPosition: number) {
+function renderFunction(functionParser: FunctionParser, projectParser: ProjectParser, outputDir: string, fileSidebarPosition: number) {
 	const slug = functionParser.name.toLowerCase().replace(/\s/g, '-');
 
 	const header = `---
@@ -19,7 +19,7 @@ custom_edit_url: null
 
 ${functionParser.signatures.length > 1 ? `## Signatures` : ''}
 
-${parseSignatures(functionParser.signatures)}`;
+${parseSignatures(functionParser.signatures, projectParser)}`;
 
 	writeFileSync(resolve(outputDir, `${slug}.mdx`), result);
 }
@@ -33,7 +33,7 @@ export function renderFunctions(projectParser: ProjectParser, outputDir: string,
 		for (const functionParser of projectParser.functions) {
 			if (functionParser.external) continue;
 
-			renderFunction(functionParser, categoryDir, fileSidebarPosition);
+			renderFunction(functionParser, projectParser, categoryDir, fileSidebarPosition);
 
 			fileSidebarPosition++;
 		}

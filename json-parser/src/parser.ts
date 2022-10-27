@@ -1,7 +1,7 @@
 import { fetch } from '@sapphire/fetch';
-import { blue, bold } from 'colorette';
+import { blue, bold, yellow } from 'colorette';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, URLSearchParams } from 'node:url';
 import {
 	ClassParser,
 	EnumParser,
@@ -19,33 +19,111 @@ import { writeCategoryYaml } from './renderer/writeCategoryYaml';
 import type { PluginOptions } from './types/PluginOptions';
 import { RepositoryContent, RepositoryContentFileType } from './types/RepositoryContent';
 
+const references: Record<string, string> = {
+	// MDN
+	BigInt64Array: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt64Array',
+	Blob: 'https://developer.mozilla.org/en-US/docs/Web/API/Blob',
+	Date: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date',
+	Error: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error',
+	Float32Array: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array',
+	Float64Array: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array',
+	Function: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function',
+	Int16Array: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array',
+	Int32Array: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array',
+	Int8Array: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array',
+	Iterable: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterable_protocol',
+	Iterator: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#the_iterator_protocol',
+	Map: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map',
+	Promise: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise',
+	RegExp: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp',
+	Response: 'https://developer.mozilla.org/en-US/docs/Web/API/Response',
+	Set: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set',
+	URL: 'https://developer.mozilla.org/en-US/docs/Web/API/URL',
+
+	// Node.js
+	'global.Buffer': 'https://nodejs.org/api/buffer.html',
+	EventEmitter: 'https://nodejs.org/api/events.html#events_class_eventemitter',
+	'global.NodeJS.EventEmitter': 'https://nodejs.org/api/events.html#events_class_eventemitter',
+	'EventEmitter.captureRejectionSymbol': 'https://nodejs.org/api/events.html#eventscapturerejectionsymbol',
+	'EventEmitter.errorMonitor': 'https://nodejs.org/api/events.html#eventserrormonitor',
+	NodeEventTarget: 'https://nodejs.org/api/events.html#class-nodeeventtarget',
+	PathLike: 'https://nodejs.org/api/path.html#path_pathlike',
+	'global.NodeJS.Timeout': 'https://nodejs.org/api/timers.html#timers_class_timeout',
+	'global.NodeJS.Timer': 'https://nodejs.org/api/timers.html#timers_class_timeout',
+	'internal.Stream': 'https://nodejs.org/api/stream.html#stream_class_stream',
+
+	// TypeScript
+	Exclude: 'https://www.typescriptlang.org/docs/handbook/utility-types.html#excludeuniontype-excludedmembers',
+	InstanceType: 'https://www.typescriptlang.org/docs/handbook/utility-types.html#instancetype',
+	Omit: 'https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys',
+	Partial: 'https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype',
+	Readonly: 'https://www.typescriptlang.org/docs/handbook/utility-types.html#readonlytype',
+	Record: 'https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type'
+};
+
+const unknownReferences: Set<string> = new Set([
+	// 'typescript'
+	'ArrayLike',
+	'AsyncIterableIterator',
+	'ClassDecorator',
+	'DOMEventTarget',
+	'InspectOptionsStylized',
+	'IterableIterator',
+	'IteratorResult',
+	'MapConstructor',
+	'MethodDecorator',
+	'PropertyKey',
+	'ObjectConstructor',
+	'ReadonlyMap'
+]);
+
 ReferenceTypeParser.formatToString = (options) => {
 	const { parser, project } = options;
-	const typeArguments = parser.typeArguments.length > 0 ? `<${parser.typeArguments.map((type) => type.toString()).join(', ')}\\>` : '';
+	const typeArguments = parser.typeArguments.length > 0 ? `< ${parser.typeArguments.map((type) => type.toString()).join(', ')}\\>` : '';
 
 	if (parser.id) {
 		const found = project?.find(parser.id);
 
-		if (found && 'external' in found && !found.external) {
-			if (found instanceof NamespaceParser) {
-				return `[\`${parser.name}\`](../namespace/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
-			} else if (found instanceof ClassParser) {
-				return `[\`${parser.name}\`](../class/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
-			} else if (found instanceof FunctionParser) {
-				return `[\`${parser.name}\`](../function/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
-			} else if (found instanceof InterfaceParser) {
-				return `[\`${parser.name}\`](../interface/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
-			} else if (found instanceof TypeAliasParser) {
-				return `[\`${parser.name}\`](../type-alias/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
-			} else if (found instanceof EnumParser) {
-				return `[\`${parser.name}\`](../enum/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
-			} else if (found instanceof VariableParser) {
-				return `[\`${parser.name}\`](../variable/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+		if (found) {
+			if ('external' in found && !found.external) {
+				if (found instanceof NamespaceParser) {
+					return `[\`${parser.name}\`](../namespace/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+				} else if (found instanceof ClassParser) {
+					return `[\`${parser.name}\`](../class/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+				} else if (found instanceof FunctionParser) {
+					return `[\`${parser.name}\`](../function/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+				} else if (found instanceof InterfaceParser) {
+					return `[\`${parser.name}\`](../interface/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+				} else if (found instanceof TypeAliasParser) {
+					return `[\`${parser.name}\`](../type-alias/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+				} else if (found instanceof EnumParser) {
+					return `[\`${parser.name}\`](../enum/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+				} else if (found instanceof VariableParser) {
+					return `[\`${parser.name}\`](../variable/${parser.name.toLowerCase().replace(/\s/g, '-')}.mdx)${typeArguments}`;
+				}
 			}
-		}
+		} else console.warn(yellow(`${bold('[WARN]')} Unable to find parser for ${parser.name} (${parser.id})`));
 	}
 
-	if (parser.packageName) return `[\`${parser.name}\`](package::${parser.packageName})${typeArguments}`;
+	if (parser.packageName) {
+		if (parser.packageName === 'discord.js')
+			return `[\`${parser.name}\`](https://discord.js.org/#/docs/discord.js/main/search?${new URLSearchParams({
+				query: parser.name
+			})})${typeArguments}`;
+		else if (parser.packageName === '@discordjs/collection')
+			return `[\`${parser.name}\`](https://discord.js.org/#/docs/collection/main/search?${new URLSearchParams({
+				query: parser.name
+			})})${typeArguments}`;
+
+		for (const [ref, url] of Object.entries(references)) {
+			if (ref === parser.name) return `[\`${parser.name}\`](${url})${typeArguments}`;
+		}
+
+		if (!unknownReferences.has(parser.name))
+			console.warn(yellow(`${bold('[WARN]')} Unable to find parser for ${parser.name} (${parser.packageName})`));
+
+		return `[\`${parser.name}\`](package::${parser.packageName})${typeArguments}`;
+	}
 
 	return `\`${parser.name}\`${typeArguments}`;
 };
@@ -60,12 +138,14 @@ export async function docusaurusTypeDocJsonParser(options: PluginOptions) {
 		headers.append('Authorization', `Bearer ${githubToken}`);
 	}
 
-	console.info(blue(`${bold('[INFO]')} Fetching GitHub API...`));
+	console.info(blue(`${bold('[INFO]')} Fetching repository content... ${bold(githubContentUrl)}`));
 
 	const repositoryContents = await fetch<RepositoryContent[]>(githubContentUrl, { headers });
 	const repositoryDirectories = repositoryContents.filter((content) => content.type === RepositoryContentFileType.Directory);
 
 	for (const directory of repositoryDirectories) {
+		console.info(blue(`${bold('[INFO]')} Fetching repository content... ${bold(directory.url)}`));
+
 		const directoryContents = await fetch<RepositoryContent[]>(directory.url, { headers });
 
 		for (const directoryContent of directoryContents) {
@@ -129,4 +209,6 @@ export async function docusaurusTypeDocJsonParser(options: PluginOptions) {
 			}
 		}
 	}
+
+	console.info(blue(`${bold('[INFO]')} Finished fetching & parsing repository content`));
 }

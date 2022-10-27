@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "tsup",
 		"debug": "node --inspect dist/cli.mjs",
-		"start": "node dist/cli.mjs",
+		"start": "NODE_NO_WARNINGS=1 node dist/cli.mjs",
 		"type-check": "tsc --noEmit"
 	},
 	"dependencies": {

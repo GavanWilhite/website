@@ -1,7 +1,6 @@
-import type { ParameterParser } from 'typedoc-json-parser';
-import { parseType } from './parseType';
+import type { ParameterParser, ProjectParser } from 'typedoc-json-parser';
 
-export function parseParameters(parameters: ParameterParser[]): string {
+export function parseParameters(parameters: ParameterParser[], projectParser: ProjectParser): string {
 	if (!parameters.length) return '';
 
 	return `| Name | Type | Description |
@@ -9,7 +8,7 @@ export function parseParameters(parameters: ParameterParser[]): string {
 ${parameters
 	.map(
 		(parameter) =>
-			`| ${parameter.name} | ${parseType(parameter.type).replace(/|/g, '\\|')} | ${
+			`| ${parameter.name} | ${parameter.type.toString(projectParser).replace(/\|/g, '\\|')} | ${
 				parameter.comment.description ?? 'No description provided.'
 			} |`
 	)
